@@ -26,7 +26,28 @@ Run all simulations
 ```shell
 gradle gatlingRun
 ```
+## Docker
 
+---
+**NOTE**
+
+In Order to run tests locally using Docker
+---
+```shell
+docker-compose up --build
+```
+
+Scale up to 5 instances
+
+```shell
+docker-compose up --build --scale gatling=2
+```
+
+Kill the instances
+
+```shell
+docker compose down
+```
 ## Reports
 
 HTML reports generated under ``build/reports/gatling/[simulation-name]/index.html``
