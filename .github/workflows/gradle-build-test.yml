@@ -1,0 +1,52 @@
+name: Load test run using Gradle
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  loadtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JVM_OPTS: "-Xmx6G"
+      SBT_OPTS: "-Dsbt.ci=true"
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.8"
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Run Gradle
+        uses: gradle/gradle-build-action@v1
+        env:
+          CI: true
+        with:
+          arguments: |
+            clean build
+            gatlingLogback
+            gatlingRun
+        id: gradle
+
+      - name: Save Gatling report
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Gatling Report
+          path: /home/runner/work/gatling-gradle-example/gatling-gradle-example/build/reports/gatling/*
